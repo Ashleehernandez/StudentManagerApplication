@@ -2,70 +2,31 @@
 using StudentManagerApplication.Applicaction.IService;
 using StudentManagerApplication.Domain.Entity;
 
+
 namespace StudentManagerApplication.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class StudentsController : Controller
     {
-        private readonly IServiceStudents serviceStudents;
-
+        private readonly IServiceStudents ServiceStudents;
         public StudentsController(IServiceStudents service)
         {
-            serviceStudents = service ?? throw new ArgumentNullException(nameof(service));
+            ServiceStudents = service ?? throw new ArgumentNullException(nameof(ServiceStudents));
         }
 
-        [HttpGet]
-        [Route("api/students/Get")]
-        public async Task<IActionResult> GetAllStudents()
-        {
-            try
-            {
-                var students = await serviceStudents.GetAllStudentsAsync();
-                return Ok(students);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (not implemented here)
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
-        }
-
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetStudentById(int id)
-        {
-            try
-            {
-                var student = await serviceStudents.GetStudentByIdAsync(id);
-                if (student == null)
-                {
-                    return NotFound($"Student with ID {id} not found.");
-                }
-                return Ok(student);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (not implemented here)
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
-        }
 
         [HttpPost]
-        [Route("api/students/Add")]
+        [Route("Add")] // Esta ruta ya se combina con [Route("api/[controller]")] -> api/students/Add
         public async Task<IActionResult> AddStudent([FromBody] Student student)
         {
             try
             {
-                if (student == null)
-                {
-                    return BadRequest("Student data is null.");
-                }
-                await serviceStudents.AddStudentAsync(student);
-                return CreatedAtAction(nameof(GetStudentById), new { id = student.Id }, student);
+                await ServiceStudents.AddStudentAsync(student);
+                return Ok("Student added successfully.");
             }
             catch (Exception ex)
             {
-                // Log the exception (not implemented here)
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
@@ -76,40 +37,13 @@ namespace StudentManagerApplication.API.Controllers
         {
             try
             {
-                if (student == null)
-                {
-                    return BadRequest("Student data is null.");
-                }
-                await serviceStudents.UpdateStudentAsync(student);
-                var updatedStudent = await serviceStudents.GetStudentByIdAsync(student.Id);
-                // Replace this line:
-                // var updatedStudent = await serviceStudents.UpdateStudentAsync(student);
 
-               
-                if (updatedStudent == null)
+                if (student == null || student.Id <= 0)
                 {
-                    return NotFound($"Student with ID {student.Id} not found.");
+                    return BadRequest("Invalid student data.");
                 }
-                return Ok(updatedStudent);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (not implemented here)
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
-        }
-
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteStudent(int id)
-        {
-            try
-            {
-                if (id <= 0)
-                {
-                    return BadRequest("ID must be greater than zero.");
-                }
-                await serviceStudents.DeleteStudentAsync(id);
-                return NoContent();
+                await ServiceStudents.UpdateStudentAsync(student);
+                return Ok("Student updated successfully.");
             }
             catch (KeyNotFoundException knfEx)
             {
@@ -119,8 +53,36 @@ namespace StudentManagerApplication.API.Controllers
             {
                 // Log the exception (not implemented here)
                 return StatusCode(500, "Internal server error: " + ex.Message);
+
+
+
+            }
+
+            [HttpDelete("{id:int}")]
+            public async Task<IActionResult> DeleteStudent(int id)
+            {
+               
+                try
+                {
+                    if (id <= 0)
+                    {
+                        return BadRequest("Invalid student ID.");
+                    }
+                    var exists = await ServiceStudents.StudentExistsAsync(id);
+                    if (!exists)
+                    {
+                        return NotFound($"Student with ID {id} not found.");
+                    }
+                    await ServiceStudents.DeleteStudentAsync(id);
+                    return Ok("Student deleted successfully.");
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception (not implemented here)
+                    return StatusCode(500, "Internal server error: " + ex.Message);
+                }
             }
         }
-    }
 
+    }
 }

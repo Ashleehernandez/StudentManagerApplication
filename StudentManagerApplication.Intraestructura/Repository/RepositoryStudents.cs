@@ -19,13 +19,10 @@ namespace StudentManagerApplication.Intraestructura.Repository
         {
             try
             {
-                if (student == null)
-                {
-                    throw new ArgumentNullException(nameof(student));
-                }
-                 await applicationDbContextDB.Students.AddAsync(student);
+                applicationDbContextDB.Students.Add(student);
                 await applicationDbContextDB.SaveChangesAsync();
-                return student;
+
+                throw new Exception("Se creo el estudiante ");
             }
             catch (Exception ex)
             {
