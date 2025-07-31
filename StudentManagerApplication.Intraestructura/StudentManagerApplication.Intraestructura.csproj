@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StudentManagerApplication.Applicaction\StudentManagerApplication.Applicaction.csproj" />
     <ProjectReference Include="..\StudentManagerApplication.Domain\StudentManagerApplication.Domain.csproj" />
   </ItemGroup>
 
