@@ -16,6 +16,7 @@ namespace StudentManagerApplication.API.Controllers
         }
 
 
+
         [HttpPost]
         [Route("Add")] // Esta ruta ya se combina con [Route("api/[controller]")] -> api/students/Add
         public async Task<IActionResult> AddStudent([FromBody] Student student)
