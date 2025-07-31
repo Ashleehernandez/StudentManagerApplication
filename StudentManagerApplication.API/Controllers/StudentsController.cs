@@ -14,7 +14,7 @@ namespace StudentManagerApplication.API.Controllers
         {
             ServiceStudents = service ?? throw new ArgumentNullException(nameof(ServiceStudents));
         }
-
+        // GET: api/students
 
         [HttpPost]
         [Route("Add")] // Esta ruta ya se combina con [Route("api/[controller]")] -> api/students/Add
